@@ -1,18 +1,12 @@
-# Usamos la versión slim de Bullseye para una imagen más ligera
 FROM debian:bullseye
 
 # Instalar dependencias específicas de la versión PHP 7.4
 RUN apt-get update && apt-get install -y \
     php7.4-fpm \
     php7.4-mysql \
-    php7.4-curl \
-    php7.4-gd \
-    php7.4-mbstring \
-    php7.4-xml \
-    php7.4-xmlrpc \
-    php7.4-zip \
-    php7.4-opcache \
+	default-mysql-client \
     wget \
+	tar \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -41,9 +35,9 @@ COPY conf/wp-config.php /var/www/html/wp-config.php
 # Exponer el puerto 9000 para PHP-FPM
 EXPOSE 9000
 
-# Usar usuario no root (se ejecutará el proceso principal como root,
-# pero los workers de PHP-FPM correrán como wp-user según la configuración)
-USER wp-user
-
 # Comando para iniciar PHP-FPM en primer plano
-CMD ["php-fpm7.4", "-F"]
+COPY ./tools/setup.sh /
+
+RUN chmod +x /setup.sh
+
+ENTRYPOINT [ "/bin/bash", "/setup.sh" ]
