@@ -18,11 +18,5 @@ RUN chmod +x /bin/startup.sh
 # Exponer el puerto 3306 de MariaDB
 EXPOSE 3306
 
-# Usar el usuario mysql para ejecutar el contenedor
-# USER mysql
-
-# Volumen persistente para datos de la base de datos
-#VOLUME /var/lib/mysql
-
 # Comando para iniciar MariaDB
 ENTRYPOINT [ "/bin/bash", "/bin/startup.sh" ]

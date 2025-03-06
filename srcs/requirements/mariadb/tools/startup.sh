@@ -1,20 +1,38 @@
 #!/bin/bash
-set -eo pipefail
+set -e
 
-mysqld_safe --skip-networking &
-
-echo "Waiting for MariaDB to start..."
-until mysqladmin ping &>/dev/null; do
-  sleep 1
-done
-
-mysql  <<EOF
-ALTER USER 'root'@'localhost' IDENTIFIED BY '${MDB_ROOT_PASSWORD}';
-CREATE IF NOT EXISTS DATABASE ${MDB_NAME};
-CREATE IF NOT EXISTS USER '${MDB_USER}'@'%' IDENTIFIED BY '${MDB_USER_PASSWORD}';
+# Verificar si la base de datos ya está inicializada
+if [ ! -d "/var/lib/mysql/mysql" ]; then
+    echo ">>> Inicializando la base de datos MariaDB..."
+    mysql_install_db --user=mysql --datadir=/var/lib/mysql
+    
+    # Iniciar el servidor temporalmente
+    echo ">>> Iniciando servidor temporalmente..."
+    /usr/bin/mysqld_safe --datadir=/var/lib/mysql &
+    
+    # Esperar a que el servidor esté disponible
+    until mysqladmin ping >/dev/null 2>&1; do
+        echo ">>> Esperando a que el servidor MySQL esté disponible..."
+        sleep 2
+    done
+    
+    echo ">>> Configurando la base de datos..."
+    mysql -u root << EOF
+CREATE DATABASE IF NOT EXISTS ${MDB_NAME};
+CREATE USER IF NOT EXISTS '${MDB_USER}'@'%' IDENTIFIED BY '${MDB_USER_PASSWORD}';
 GRANT ALL ON ${MDB_NAME}.* TO '${MDB_USER}'@'%';
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${MDB_ROOT_PASSWORD}';
+FLUSH PRIVILEGES;
 EOF
+    
+    # Detener el servidor temporal
+    echo ">>> Deteniendo servidor temporal..."
+    mysqladmin -u root -p${MDB_ROOT_PASSWORD} shutdown
+    
+    echo ">>> Inicialización completada"
+else
+    echo ">>> La base de datos ya está inicializada"
+fi
 
-mysqladmin --user=root --password="${MDB_ROOT_PASSWORD}" shutdown
-
+echo ">>> Iniciando MariaDB..."
 exec mysqld_safe

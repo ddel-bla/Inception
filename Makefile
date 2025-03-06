@@ -17,7 +17,7 @@ clean:
 	docker volume rm $$(docker volume ls -q) 2>/dev/null || true; \
 	docker network rm $$(docker network ls -q | grep -v "bridge\|host\|none") 2>/dev/null || true;
 
-fclean:
+fclean: clean
 	docker system prune -f
 
 logs-maria: 
