@@ -21,9 +21,14 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 CREATE DATABASE IF NOT EXISTS ${MDB_NAME};
 CREATE USER IF NOT EXISTS '${MDB_USER}'@'%' IDENTIFIED BY '${MDB_USER_PASSWORD}';
 GRANT ALL PRIVILEGES ON ${MDB_NAME}.* TO '${MDB_USER}'@'%';
+GRANT ALL PRIVILEGES ON *.* TO '${MDB_USER}'@'%';
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${MDB_ROOT_PASSWORD}';
 FLUSH PRIVILEGES;
 EOF
+    
+    # Comprobar los permisos para verificar
+    echo ">>> Verificando permisos..."
+    mysql -u root -p${MDB_ROOT_PASSWORD} -e "SELECT User, Host FROM mysql.user;"
     
     # Detener el servidor temporal
     echo ">>> Deteniendo servidor temporal..."

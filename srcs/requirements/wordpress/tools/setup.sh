@@ -5,7 +5,7 @@ set -eo pipefail
 chown -R www-data:www-data /var/www/wordpress
 
 # Esperar a la base de datos
-while ! mysqladmin ping -hdb -u${MDB_USER} -p${MDB_USER_PASSWORD} --silent; do
+while ! mysqladmin ping -hmariadb -u${MDB_USER} -p${MDB_USER_PASSWORD} --silent; do
 	sleep 2
 done
 
