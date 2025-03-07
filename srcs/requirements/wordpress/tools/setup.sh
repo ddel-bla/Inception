@@ -16,7 +16,7 @@ if [ ! -f "/var/www/wordpress/wp-config.php" ]; then
 		--dbname=${MDB_NAME} \
 		--dbuser=${MDB_USER} \
 		--dbpass=${MDB_USER_PASSWORD} \
-		--dbhost=mariadb
+		--dbhost=mariadb \
 		--path=/var/www/wordpress \
 		--allow-root \
 		--extra-php <<PHP
