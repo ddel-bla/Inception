@@ -7,7 +7,7 @@ services:
       - db_data:/var/lib/mysql
     networks:
       - inception-net
-    restart: unless-stopped
+    restart: on-failure
     env_file: .env
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${MDB_USER}", "-p${MDB_USER_PASSWORD}"]
@@ -22,7 +22,7 @@ services:
       - wp_data:/var/www/wordpress
     networks:
       - inception-net
-    restart: unless-stopped
+    restart: on-failure
     expose:
       - "9000"
     depends_on:
@@ -37,7 +37,7 @@ services:
       - wp_data:/var/www/wordpress
     networks:
       - inception-net
-    restart: unless-stopped
+    restart: on-failure
     depends_on:
       - wordpress
     env_file: .env

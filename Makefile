@@ -1,12 +1,13 @@
 all: setup
-	docker compose -f ./srcs/docker-compose.yml up -d --build
+	docker-compose -f ./srcs/docker-compose.yml up -d --build
 
 setup:
 	mkdir -p /home/ddel-bla/data/mariadb
 	mkdir -p /home/ddel-bla/data/wordpress
-
+	sudo chmod -R 777 /home/ddel-bla/data/mariadb
+	sudo chmod -R 777 /home/ddel-bla/data/wordpress
 down:
-	docker compose -f ./srcs/docker-compose.yml down
+	docker-compose -f ./srcs/docker-compose.yml down
 
 re: down clean all
 
@@ -19,6 +20,8 @@ clean:
 
 fclean: clean
 	docker system prune -f
+	sudo rm -rf /home/ddel-bla/data/mariadb/*
+	sudo rm -rf /home/ddel-bla/data/wordpress/*
 
 logs-maria: 
 	docker logs -f srcs-mariadb-1
